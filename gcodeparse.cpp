@@ -172,7 +172,7 @@ float GCodeParse::crawl_too_number(string str, char crawl_too) {
         int end = this->crawl_too(str, ' ', start);
         if (end != -1) {
             string str_out = str.substr(start + 1,end - start - 1);
-            val = read_float(str);
+            val = read_float(str_out);
         }
     }
     return val;
