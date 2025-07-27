@@ -1,4 +1,7 @@
+/*
+Class that just contains a simple class too be tossed around between parts containing all the data, in an already parsed way
 
+*/
 
 
 #ifndef gcode_h
