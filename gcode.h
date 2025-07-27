@@ -12,6 +12,8 @@ Class that just contains a simple class too be tossed around between parts conta
 class GCodeInstruction {
 public:
     float x, y, z, f, i, j;
+    // info on if these values were defined or left blank
+    bool _x = false, _y = false, _z = false, _f = false, _i = false, _j = false;
     int command_number;
     char command_char;
     std::string out();

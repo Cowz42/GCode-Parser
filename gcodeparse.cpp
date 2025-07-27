@@ -22,7 +22,7 @@ int GCodeParse::set_working_file(string filename) {
 // Function that reads the next command in the file, parses it, and outputs a GCodeInstruction with the data, 
 //and writes the pointers it has for more direct access
 GCodeInstruction* GCodeParse::read_command() {
-    float x = 0, y = 0, z = 0, f = 0;
+    float x = 0, y = 0, z = 0, f = 0, i = 0, j = 0;
     Command_Types command;
 
     
@@ -37,33 +37,62 @@ GCodeInstruction* GCodeParse::read_command() {
         command_number += (current_command[1] - 48) * 10; 
         command = G;
     } else {return nullptr;}
-    
-    if (command == G && (command_number == 1 || command_number == 0)) {
-        // simple commands, handeled in a really simple way and I'm lazy
 
+    // allocate a GCodeInstruction, the calling function is responsible for freeing the memory, and it could cause memory leaks
+    GCodeInstruction* out = (GCodeInstruction*)malloc(sizeof(GCodeInstruction));
+
+
+    int length = current_command.length() - 1;
+
+    if (crawl_too(current_command, 'X') != length) {
         x = crawl_too_number(current_command, 'X');
+        out->_x = true;
+    }
+    if (crawl_too(current_command, 'Y') != length) {
         y = crawl_too_number(current_command, 'Y');
+        out->_y = true;
+    }
+    if (crawl_too(current_command, 'Z') != length) {
         z = crawl_too_number(current_command, 'Z');
-        f = 0;
-        // G00 has no speed, it's just max, so a zero will be returned and indicate max speed
-        if (command_number == 1) {
-            f = crawl_too_number(current_command, 'F');
-        }
-        x_val = x;
-        y_val = y;
-        z_val = z;
-        f_val = f;
+        out->_z = true;
+    }
+    if (crawl_too(current_command, 'I') != length) {
+        i = crawl_too_number(current_command, 'I');
+        out->_i = true;
+    }
+    if (crawl_too(current_command, 'J') != length) {
+        j = crawl_too_number(current_command, 'J');
+        out->_j = true;
+    }
 
-        // cout << "X: " << to_string(x) << "\tY: " << to_string(y) << "\tZ: " << to_string(z) << "\tF: " << to_string(f) << "\n";
-        GCodeInstruction* out = (GCodeInstruction*)malloc(sizeof(GCodeInstruction));
-        out->x = x;
-        out->y = y;
-        out->z = z;
-        out->f = f;
-        out->command_number = command_number;
+    // G00 has no speed, it's just max, so a zero will be returned and indicate max speed
+    if (command_number == 1) {
+        f = crawl_too_number(current_command, 'F');
+    }
+    x_val = x;
+    y_val = y;
+    z_val = z;
+    f_val = f;
+    i_val = i;
+    j_val = j;
+
+    // cout << "X: " << to_string(x) << "\tY: " << to_string(y) << "\tZ: " << to_string(z) << "\tF: " << to_string(f) << "\n";
+    out->x = x;
+    out->y = y;
+    out->z = z;
+    out->f = f;
+    out->i = i;
+    out->j = j;
+    
+    // default for G commands, with x,y,z,f,i,j all recorded by default, and will mark it if it isn't present
+    if (command == G) {
         out->command_char = 'G';
+        out->command_number = command_number;
+
         return out;
     }
+
+    
     return nullptr;
 };
 
@@ -132,17 +161,21 @@ int GCodeParse::crawl_too(string_view str, char crawl_char, int start_from) {
     return str.length() - 1;
 };
 
-void GCodeParse::write_simple_values(float* x_out = nullptr, float* y_out = nullptr, float* z_out = nullptr, float* f_out = nullptr) {
-    if (!(x_out == nullptr || y_out == nullptr || z_out == nullptr || f_out == nullptr)) {
-        x = x_out;
-        y = y_out;
-        z = z_out;
-        f = f_out;
+void GCodeParse::write_simple_values(float* x_out = nullptr, float* y_out = nullptr, float* z_out = nullptr, float* f_out = nullptr, float* i_out = nullptr, float* j_out = nullptr) {
+    if (!(x_out == nullptr || y_out == nullptr || z_out == nullptr || f_out == nullptr || i_out == nullptr || j_out == nullptr)) {
+        x_ptr = x_out;
+        y_ptr = y_out;
+        z_ptr = z_out;
+        f_ptr = f_out;
+        i_ptr = i_out;
+        j_ptr = j_out;
     }
-    *x = x_val;
-    *y = y_val;
-    *z = z_val;
-    *f = f_val;
+    *x_ptr = x_val;
+    *y_ptr = y_val;
+    *z_ptr = z_val;
+    *f_ptr = f_val;
+    *i_ptr = i_val;
+    *j_ptr = j_val;
 };
 
 float GCodeParse::crawl_too_number(string str, char crawl_too) {
@@ -151,7 +184,7 @@ float GCodeParse::crawl_too_number(string str, char crawl_too) {
     if (start != -1) {
         int end = this->crawl_too(str, ' ', start);
         if (end != -1) {
-            string str_out = str.substr(start + 1,end - start - 1);
+            string str_out = str.substr(start + 1,end - start - (end == str.length() - 1? 0 : 1));
             val = read_float(str_out);
         }
     }

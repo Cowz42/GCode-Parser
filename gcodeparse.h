@@ -26,8 +26,8 @@ private:
     std::ifstream Working_File;
     // pointers stored so you can just pass the addresses and it will write them automatically
     int command_number;
-    float* x; float* y; float* z; float* f;
-    float x_val, y_val, z_val, f_val;
+    float* x_ptr; float* y_ptr; float* z_ptr; float* f_ptr; float* i_ptr; float* j_ptr;
+    float x_val, y_val, z_val, f_val, i_val, j_val;
     enum Command_Types {
         G
     };
@@ -40,7 +40,7 @@ public:
     GCodeParse() {}
     int set_working_file(std::string filename);
     GCodeInstruction* read_command();
-    void write_simple_values(float* x_out, float* y_out, float* z_out, float* f_out);
+    void write_simple_values(float* x_out, float* y_out, float* z_out, float* f_out, float* i_out, float* j_out);
 };
 
 #endif
