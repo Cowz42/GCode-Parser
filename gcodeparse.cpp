@@ -24,7 +24,7 @@ GCodeInstruction* GCodeParse::read_command() {
 
     
     getline(Working_File, current_command);
-    std::cout << current_command << "\n";
+    // std::cout << current_command << "\n";
     if (current_command.empty()) {
         return nullptr;
     }
@@ -74,7 +74,7 @@ GCodeInstruction* GCodeParse::read_command() {
         z_val = z;
         f_val = f;
 
-        cout << "X: " << to_string(x) << "\tY: " << to_string(y) << "\tZ: " << to_string(z) << "\tF: " << to_string(f) << "\n";
+        // cout << "X: " << to_string(x) << "\tY: " << to_string(y) << "\tZ: " << to_string(z) << "\tF: " << to_string(f) << "\n";
         GCodeInstruction* out = (GCodeInstruction*)malloc(sizeof(GCodeInstruction));
         out->x = x;
         out->y = y;
