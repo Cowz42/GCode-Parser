@@ -18,6 +18,9 @@ int GCodeParse::set_working_file(string filename) {
     return 0;
 };
 
+
+// Function that reads the next command in the file, parses it, and outputs a GCodeInstruction with the data, 
+//and writes the pointers it has for more direct access
 GCodeInstruction* GCodeParse::read_command() {
     float x = 0, y = 0, z = 0, f = 0;
     Command_Types command;
@@ -37,38 +40,15 @@ GCodeInstruction* GCodeParse::read_command() {
     
     if (command == G && (command_number == 1 || command_number == 0)) {
         // simple commands, handeled in a really simple way and I'm lazy
-        int x_start = crawl_too(current_command, 'X');
-        if (x_start != -1) {
-            int x_end = crawl_too(current_command, ' ', x_start);
-            if (x_end != -1) {
-                string x_str = current_command.substr(x_start + 1,x_end - x_start - 1);
-                x = read_float(x_str);
-            }
-        }
-
-        int y_start = crawl_too(current_command, 'Y');
-        if (y_start != -1) {
-            int y_end = crawl_too(current_command, ' ', y_start);
-            if (y_end != -1) {
-                string y_str = current_command.substr(y_start + 1,y_end - y_start - 1);
-                y = read_float(y_str);
-            }
-        }
-
-        int z_start = crawl_too(current_command, 'Z');
-        if (z_start != -1) {
-            int z_end = crawl_too(current_command, ' ', z_start);
-            if (z_end != -1) {
-                string z_str = current_command.substr(z_start + 1,z_end - z_start - 1);
-                z = read_float(z_str);
-            }
-        }
 
         x = crawl_too_number(current_command, 'X');
         y = crawl_too_number(current_command, 'Y');
         z = crawl_too_number(current_command, 'Z');
-        f = crawl_too_number(current_command, 'F');
-
+        f = 0;
+        // G00 has no speed, it's just max, so a zero will be returned and indicate max speed
+        if (command_number == 1) {
+            f = crawl_too_number(current_command, 'F');
+        }
         x_val = x;
         y_val = y;
         z_val = z;
