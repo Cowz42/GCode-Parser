@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 
+// class for making reading command line areguments easier
 class Reader {
 public:
     // contents of teh command line

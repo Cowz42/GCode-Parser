@@ -9,6 +9,7 @@ Class that just contains a simple class too be tossed around between parts conta
 
 #include <string>
 
+// Class that contains all the information in a gcode line, with varibles and instruction type and number
 class GCodeInstruction {
 public:
     float x, y, z, f, i, j;
@@ -16,7 +17,9 @@ public:
     bool _x = false, _y = false, _z = false, _f = false, _i = false, _j = false;
     int command_number;
     char command_char;
+    // Prints out the line as it was before parsing
     std::string out();
+    // resets bools to prevent any weird memory trickery from adding a 0 value in
     void reset();
 };
 
