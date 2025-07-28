@@ -76,31 +76,39 @@ GCodeInstruction* GCodeParse::read_command(string parse) {
 
     // crawls for every character, if it finds it, then it marks it as present in the output GCodeInstruction, by default they aren't
     // along with also calculating the value, and then storing it for other parts
-    if (crawl_too(current_command, 'X') != length) {
+    // also tests to make sure that it isn't going into the next instruction if there is more
+    int x_crawl = crawl_too(current_command, 'X');
+    if (x_crawl != length && x_crawl < g && x_crawl < m) {
         x = crawl_too_number(current_command, 'X');
         out->_x = true;
     }
-    if (crawl_too(current_command, 'Y') != length) {
+    int y_crawl = crawl_too(current_command, 'Y');
+    if (y_crawl != length && y_crawl < g && y_crawl < m) {
         y = crawl_too_number(current_command, 'Y');
         out->_y = true;
     }
-    if (crawl_too(current_command, 'Z') != length) {
+    int z_crawl = crawl_too(current_command, 'Z');
+    if (z_crawl != length && z_crawl < g && z_crawl < m) {
         z = crawl_too_number(current_command, 'Z');
         out->_z = true;
     }
-    if (crawl_too(current_command, 'I') != length) {
-        i = crawl_too_number(current_command, 'I');
-        out->_i = true;
-    }
-    if (crawl_too(current_command, 'J') != length) {
-        j = crawl_too_number(current_command, 'J');
-        out->_j = true;
-    }
-    if (crawl_too(current_command, 'F') != length) {
+    int f_crawl = crawl_too(current_command, 'F');
+    if (f_crawl != length && f_crawl < g && f_crawl < m) {
         f = crawl_too_number(current_command, 'F');
         out->_f = true;
     }
-    if (crawl_too(current_command, 'S') != length) {
+    int i_crawl = crawl_too(current_command, 'I');
+    if (i_crawl != length && i_crawl < g && i_crawl < m) {
+        i = crawl_too_number(current_command, 'I');
+        out->_i = true;
+    }
+    int j_crawl = crawl_too(current_command, 'J');
+    if (j_crawl != length && j_crawl < g && j_crawl < m) {
+        j = crawl_too_number(current_command, 'J');
+        out->_j = true;
+    }
+    int s_crawl = crawl_too(current_command, 'S');
+    if (s_crawl != length && s_crawl < g && s_crawl < m) {
         s = crawl_too_number(current_command, 'S');
         out->_s = true;
     }
