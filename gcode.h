@@ -12,9 +12,9 @@ Class that just contains a simple class too be tossed around between parts conta
 // Class that contains all the information in a gcode line, with varibles and instruction type and number
 class GCodeInstruction {
 public:
-    float x, y, z, f, i, j;
+    float x, y, z, f, i, j, s;
     // info on if these values were defined or left blank
-    bool _x = false, _y = false, _z = false, _f = false, _i = false, _j = false;
+    bool _x = false, _y = false, _z = false, _f = false, _i = false, _j = false, _s = false;
     int command_number;
     char command_char;
     // Prints out the line as it was before parsing
