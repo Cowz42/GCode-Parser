@@ -18,11 +18,18 @@ int GCodeParse::set_working_file(string filename) {
 
 // Function that reads the next command in the file, parses it, and outputs a GCodeInstruction with the data, 
 // and writes the pointers it has for more direct access
-GCodeInstruction* GCodeParse::read_command() {
-    float x = 0, y = 0, z = 0, f = 0, i = 0, j = 0;
+// will also parse a string directly
+GCodeInstruction* GCodeParse::read_command(string parse) {
+    float x = 0, y = 0, z = 0, f = 0, i = 0, j = 0, s = 0;
 
-    // gets working line of gcode
-    getline(Working_File, current_command);
+    // gets working line of gcode if there isn't an input and there is no need to recheck the previous line
+    if (parse == "" && !multi_command) {
+        getline(Working_File, current_command);
+    } else {
+        if (parse != "") {
+            current_command = parse;
+        }
+    }
 
     // if the line is empty, then it just returns nullptr as their is no data
     if (current_command.empty()) {
@@ -33,6 +40,25 @@ GCodeInstruction* GCodeParse::read_command() {
     int comment_excluder = crawl_too(current_command, ';');
     if (comment_excluder != current_command.length() - 1) {
         current_command = current_command.substr(0, comment_excluder);
+    }
+
+    if (multi_command) {
+        // sets current_command to be the correct value with a command already
+        int last = current_command.length() - 1;
+        int m = crawl_too(current_command, 'M', 2);
+        int g = crawl_too(current_command, 'G', 2);
+        
+        if (m != last || g != last) {
+            current_command = current_command.substr(g > m?m:g, last);
+        }
+        multi_command = false;
+    }
+    // code for calculating if there is another instruction later in the line
+    int last = current_command.length() - 1;
+    int m = crawl_too(current_command, 'M', 2);
+    int g = crawl_too(current_command, 'G', 2);
+    if ((g > 0 && g != last) && (m > 0 && g != last)) {
+        multi_command = true;
     }
 
     // wrote before I made a function for this, but this is way faster and I don't care
@@ -74,6 +100,10 @@ GCodeInstruction* GCodeParse::read_command() {
         f = crawl_too_number(current_command, 'F');
         out->_f = true;
     }
+    if (crawl_too(current_command, 'S') != length) {
+        s = crawl_too_number(current_command, 'S');
+        out->_s = true;
+    }
 
     // writes the values to the local stored in the class
     x_val = x;
@@ -82,6 +112,7 @@ GCodeInstruction* GCodeParse::read_command() {
     f_val = f;
     i_val = i;
     j_val = j;
+    s_val = s;
 
     // stores the values to the output GCodeInstruction
     // cout << "X: " << to_string(x) << "\tY: " << to_string(y) << "\tZ: " << to_string(z) << "\tF: " << to_string(f) << "\n";
@@ -91,6 +122,7 @@ GCodeInstruction* GCodeParse::read_command() {
     out->f = f;
     out->i = i;
     out->j = j;
+    out->s = s;
 
 
     
@@ -175,15 +207,16 @@ int GCodeParse::crawl_too(string_view str, char crawl_char, int start_from) {
     return str.length() - 1;
 };
 
-void GCodeParse::write_simple_values(float* x_out = nullptr, float* y_out = nullptr, float* z_out = nullptr, float* f_out = nullptr, float* i_out = nullptr, float* j_out = nullptr) {
+void GCodeParse::write_simple_values(float* x_out = nullptr, float* y_out = nullptr, float* z_out = nullptr, float* f_out = nullptr, float* i_out = nullptr, float* j_out = nullptr, float* s_out = nullptr) {
     // makes sure that you give it memory addresses to work with
-    if (!(x_out == nullptr || y_out == nullptr || z_out == nullptr || f_out == nullptr || i_out == nullptr || j_out == nullptr)) {
+    if (!(x_out == nullptr || y_out == nullptr || z_out == nullptr || f_out == nullptr || i_out == nullptr || j_out == nullptr || s_out == nullptr)) {
         x_ptr = x_out;
         y_ptr = y_out;
         z_ptr = z_out;
         f_ptr = f_out;
         i_ptr = i_out;
         j_ptr = j_out;
+        s_ptr = s_out;
     }
     // stores the values to the memory addresses
     *x_ptr = x_val;
@@ -192,6 +225,7 @@ void GCodeParse::write_simple_values(float* x_out = nullptr, float* y_out = null
     *f_ptr = f_val;
     *i_ptr = i_val;
     *j_ptr = j_val;
+    *s_ptr = s_val;
 };
 
 float GCodeParse::crawl_too_number(string str, char crawl_too) {
