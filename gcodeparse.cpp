@@ -29,6 +29,12 @@ GCodeInstruction* GCodeParse::read_command() {
         return nullptr;
     }
 
+    // cuts off the command at the comment marker
+    int comment_excluder = crawl_too(current_command, ';');
+    if (comment_excluder != current_command.length() - 1) {
+        current_command = current_command.substr(0, comment_excluder);
+    }
+
     // wrote before I made a function for this, but this is way faster and I don't care
     command_number = current_command[2] - 48;
     command_number += (current_command[1] - 48) * 10;
@@ -198,9 +204,19 @@ float GCodeParse::crawl_too_number(string str, char crawl_too) {
         if (end != -1) {
             // splits str to get only the number part, if it is the line end, then it makes sure to include that value, othewise, the space has to be discarded
             string str_out = str.substr(start + 1,end - start - (end == str.length() - 1? 0 : 1));
+            str_out = reverse_crawl(str_out);
             // calls read_float to do the rest
             val = read_float(str_out);
         }
     }
     return val;
+};
+
+string GCodeParse::reverse_crawl(string str) {
+    // recursively calls it self chopping off the last character till it gets to numbers
+    int length = str.length() - 1;
+    if (str[length] > 57 || str[length] < 48) {
+        return reverse_crawl(str.substr(0, length - 1));
+    }
+    return str;
 };

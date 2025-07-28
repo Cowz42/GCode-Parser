@@ -36,6 +36,8 @@ private:
     int crawl_too(std::string_view str, char crawl_char, int start_from = 0);
     // finds a number after a specific character, e.g. return 1.5 from ("I like potatoes H1.5", 'H')
     float crawl_too_number(std::string str, char crawl_too);
+    // function to fix a bug involving non allowed characters and how comments are processed
+    std::string reverse_crawl(std::string str);
 
 public:
     // sets the working file from current directory, from file name
