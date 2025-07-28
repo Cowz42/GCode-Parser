@@ -23,27 +23,31 @@ int GCodeParse::set_working_file(string filename) {
 //and writes the pointers it has for more direct access
 GCodeInstruction* GCodeParse::read_command() {
     float x = 0, y = 0, z = 0, f = 0, i = 0, j = 0;
-    Command_Types command;
 
-    
+    // gets working line of gcode
     getline(Working_File, current_command);
     // std::cout << current_command << "\n";
+
+    // if the line is empty, then it just returns nullptr as their is no data
     if (current_command.empty()) {
         return nullptr;
     }
 
-    if (current_command[0] == 'G') {
-        command_number = current_command[2] - 48;
-        command_number += (current_command[1] - 48) * 10; 
-        command = G;
-    } else {return nullptr;}
+    // wrote before I made a function for this, but this is way faster and I don't care
+    command_number = current_command[2] - 48;
+    command_number += (current_command[1] - 48) * 10;
 
     // allocate a GCodeInstruction, the calling function is responsible for freeing the memory, and it could cause memory leaks
     GCodeInstruction* out = (GCodeInstruction*)malloc(sizeof(GCodeInstruction));
+    out->reset();
 
-
+    // subtracted one cause I only need the length -1, and so it just does the math once
     int length = current_command.length() - 1;
 
+
+
+    // crawls for every character, if it finds it, then it marks it as present in the output GCodeInstruction, by default they aren't
+    // along with also calculating the value, and then storing it for other parts
     if (crawl_too(current_command, 'X') != length) {
         x = crawl_too_number(current_command, 'X');
         out->_x = true;
@@ -64,11 +68,12 @@ GCodeInstruction* GCodeParse::read_command() {
         j = crawl_too_number(current_command, 'J');
         out->_j = true;
     }
-
-    // G00 has no speed, it's just max, so a zero will be returned and indicate max speed
-    if (command_number == 1) {
+    if (crawl_too(current_command, 'F') != length) {
         f = crawl_too_number(current_command, 'F');
+        out->_f = true;
     }
+
+    // writes the values to the local stored in the class, cause I can
     x_val = x;
     y_val = y;
     z_val = z;
@@ -76,6 +81,7 @@ GCodeInstruction* GCodeParse::read_command() {
     i_val = i;
     j_val = j;
 
+    // stores the values to the output GCodeInstruction
     // cout << "X: " << to_string(x) << "\tY: " << to_string(y) << "\tZ: " << to_string(z) << "\tF: " << to_string(f) << "\n";
     out->x = x;
     out->y = y;
@@ -83,17 +89,14 @@ GCodeInstruction* GCodeParse::read_command() {
     out->f = f;
     out->i = i;
     out->j = j;
+
+
     
     // default for G commands, with x,y,z,f,i,j all recorded by default, and will mark it if it isn't present
-    if (command == G) {
-        out->command_char = 'G';
-        out->command_number = command_number;
-
-        return out;
-    }
-
-    
-    return nullptr;
+    // IDK how other commands work, but this should work for reading them all
+    out->command_char = current_command[0];
+    out->command_number = command_number;
+    return out;
 };
 
 // converts a given string into a float, WARNING: will not check if there are only number chars, will just subtract the ascii values

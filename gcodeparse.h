@@ -28,9 +28,6 @@ private:
     int command_number;
     float* x_ptr; float* y_ptr; float* z_ptr; float* f_ptr; float* i_ptr; float* j_ptr;
     float x_val, y_val, z_val, f_val, i_val, j_val;
-    enum Command_Types {
-        G
-    };
     float read_float(std::string str);
     int64_t read_int(std::string_view str);
     int crawl_too(std::string_view str, char crawl_char, int start_from = 0);
