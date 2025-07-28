@@ -17,6 +17,7 @@ public:
     int command_number;
     char command_char;
     std::string out();
+    void reset();
 };
 
 
