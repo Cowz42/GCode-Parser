@@ -9,9 +9,6 @@ using namespace std;
 
 
 
-// #error "cpp file"
-
-
 int GCodeParse::set_working_file(string filename) {
     file_name = filename;
     Working_File = ifstream(file_name);
@@ -20,13 +17,12 @@ int GCodeParse::set_working_file(string filename) {
 
 
 // Function that reads the next command in the file, parses it, and outputs a GCodeInstruction with the data, 
-//and writes the pointers it has for more direct access
+// and writes the pointers it has for more direct access
 GCodeInstruction* GCodeParse::read_command() {
     float x = 0, y = 0, z = 0, f = 0, i = 0, j = 0;
 
     // gets working line of gcode
     getline(Working_File, current_command);
-    // std::cout << current_command << "\n";
 
     // if the line is empty, then it just returns nullptr as their is no data
     if (current_command.empty()) {
@@ -73,7 +69,7 @@ GCodeInstruction* GCodeParse::read_command() {
         out->_f = true;
     }
 
-    // writes the values to the local stored in the class, cause I can
+    // writes the values to the local stored in the class
     x_val = x;
     y_val = y;
     z_val = z;
@@ -101,12 +97,13 @@ GCodeInstruction* GCodeParse::read_command() {
 
 // converts a given string into a float, WARNING: will not check if there are only number chars, will just subtract the ascii values
 float GCodeParse::read_float(string str) {
+    //sign check
     bool negative = false;
     if (str[0] == '-') {
         negative = true;
         str = str.substr(1,str.length()-1);
     }
-
+    // searches for a decimal point if there is one, and then splits it
     int split = 0;
     while(true) {
         if (str[split] == '.') {
@@ -120,6 +117,7 @@ float GCodeParse::read_float(string str) {
     }
     float sum = 0;
 
+    // sending the parts to read_int() to parse seperatly
     // calculates part below zero, then divides it to correct and make it the actual decimal
     // extra check if there even is a decimal part
     if (split != -1) {
@@ -143,11 +141,15 @@ float GCodeParse::read_float(string str) {
 
 int64_t GCodeParse::read_int(string_view str) {
     int64_t sum = 0;
+    // goes through array in reverse for more convienent power multiplcation
     for (int i = str.length() - 1; i > -1; i--) {
+        // makes power of digit based off of index
         int mult = 1;
         for (int j = 0; j < str.length() - 1 - i; j++) {
             mult *= 10;
         }
+        // char gets 48 subtracted from it as '0' = int 48, so the conversion is simple
+        // also multiplied by the power
         sum += (str[i] - 48) * mult;
     }
     return sum;
@@ -155,16 +157,20 @@ int64_t GCodeParse::read_int(string_view str) {
 
 
 int GCodeParse::crawl_too(string_view str, char crawl_char, int start_from) {
+    // checks for out of range
     if (start_from >= str.length()) {return -1;}
+    // searches looking for the value
     for (int i = start_from; i < str.length(); i++) {
         if (str[i] == crawl_char) {
             return i;
         }
     }
+    // default return is the end index in the array
     return str.length() - 1;
 };
 
 void GCodeParse::write_simple_values(float* x_out = nullptr, float* y_out = nullptr, float* z_out = nullptr, float* f_out = nullptr, float* i_out = nullptr, float* j_out = nullptr) {
+    // makes sure that you give it memory addresses to work with
     if (!(x_out == nullptr || y_out == nullptr || z_out == nullptr || f_out == nullptr || i_out == nullptr || j_out == nullptr)) {
         x_ptr = x_out;
         y_ptr = y_out;
@@ -173,6 +179,7 @@ void GCodeParse::write_simple_values(float* x_out = nullptr, float* y_out = null
         i_ptr = i_out;
         j_ptr = j_out;
     }
+    // stores the values to the memory addresses
     *x_ptr = x_val;
     *y_ptr = y_val;
     *z_ptr = z_val;
@@ -183,11 +190,15 @@ void GCodeParse::write_simple_values(float* x_out = nullptr, float* y_out = null
 
 float GCodeParse::crawl_too_number(string str, char crawl_too) {
     float val;
+    // finds the search character
     int start = this->crawl_too(str, crawl_too);
     if (start != -1) {
+        // attempts to find the end of the number, in gcodes case, a space or a line end
         int end = this->crawl_too(str, ' ', start);
         if (end != -1) {
+            // splits str to get only the number part, if it is the line end, then it makes sure to include that value, othewise, the space has to be discarded
             string str_out = str.substr(start + 1,end - start - (end == str.length() - 1? 0 : 1));
+            // calls read_float to do the rest
             val = read_float(str_out);
         }
     }
