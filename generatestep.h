@@ -28,6 +28,7 @@ private:
     int next_home(float* x, float* y, float* z);
     Machine* machine;
     double angle(float x, float y);
+    float* junk;
 
 public:
     StepGen(GCodeInstruction* instruction, Machine* machine_in);

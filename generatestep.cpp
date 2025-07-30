@@ -17,6 +17,7 @@ enum Plane {
 StepGen::StepGen(GCodeInstruction* instruction, Machine* machine_in) {
     machine = machine_in;
     command = instruction;
+
     steps = -1;
     if (command->command_char == 'G') {
         int num = command->command_number;
@@ -49,7 +50,7 @@ double StepGen::angle(float x, float y) {
 };
 
 
-// error codes: -1, no valid instruction, -2, missing values from instruction
+// error codes: -1, starting, flag for later, might get it, -2, missing values from instruction, -3 missing pointers for control, -4, no valid instruction
 int StepGen::next(float* x_pre, float* y_pre, float* z_pre) {
     if (x_pre == nullptr || y_pre == nullptr || z_pre == nullptr) {
         return -3;
@@ -57,10 +58,9 @@ int StepGen::next(float* x_pre, float* y_pre, float* z_pre) {
     if (steps == -1) {
         if (machine->get_plane() == XY) {
             char circ[4] = { 'X', 'Y', 'I', 'J' };
-            char lin[3] = { 'X', 'Y', 'Z' };
             if ((mode == CIRCCLOCK || mode == CIRCCOUNT) && !command->check_values(circ, 4)) {
                 return -2;
-            } else if ((mode == LINEAR || mode == RAPID) && !command->check_values(lin, 3)) {
+            } else if (command->check_values()) {
                 return -2;
             }
         } else if (machine->get_plane() == YZ) {
@@ -68,19 +68,29 @@ int StepGen::next(float* x_pre, float* y_pre, float* z_pre) {
             char lin[3] = { 'X', 'Y', 'Z' };
             if ((mode == CIRCCLOCK || mode == CIRCCOUNT) && !command->check_values(circ, 4)) {
                 return -2;
-            } else if ((mode == LINEAR || mode == RAPID) && !command->check_values(lin, 3)) {
+            } else if (command->check_values()) {
                 return -2;
             }
         } else if (machine->get_plane() == XZ) {
             char circ[4] = { 'X', 'Z', 'I', 'J' };
-            char lin[3] = { 'X', 'Y', 'Z' };
             if ((mode == CIRCCLOCK || mode == CIRCCOUNT) && !command->check_values(circ, 4)) {
                 return -2;
-            } else if ((mode == LINEAR || mode == RAPID) && !command->check_values(lin, 3)) {
+            } else if (command->check_values()) {
                 return -2;
             }
         }
     }
+
+    if (!command->_x) {
+        x_pre = junk;
+    }
+    if (!command->_y) {
+        y_pre = junk;
+    }
+    if (!command->_z) {
+        z_pre = junk;
+    }
+
     float* x; float* y; float* z;
     if (machine->get_plane() == XY) {
         x = x_pre;
@@ -107,7 +117,7 @@ int StepGen::next(float* x_pre, float* y_pre, float* z_pre) {
     } else if (mode == LINEAR) {
         return next_linear(x, y, z);
     }
-    return -1;
+    return -4;
 };
 
 // memory allocation for commands, circ interpolation, [start_angle, end_angle, radius, current_angle, step_angle]

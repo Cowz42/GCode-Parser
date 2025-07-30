@@ -21,7 +21,12 @@ void GCodeInstruction::reset() {
     _s = false;
 };
 
-bool GCodeInstruction::check_values(char* arr, int arr_len) {
+bool GCodeInstruction::check_values(char* arr = nullptr, int arr_len = 0) {
+    if (arr == nullptr) {
+        if (!(_x || _y || _z)) {
+            return false;
+        }
+    }
     for (int i = 0; i < arr_len; i++) {
         if (arr[i] == 'X' && !_x) {
             return false;
