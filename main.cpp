@@ -4,6 +4,7 @@
 #include "gcodeparse.h"
 #include "gcode.h"
 #include "commandlineread.h"
+#include "generatestep.h"
 using namespace std;
 
 

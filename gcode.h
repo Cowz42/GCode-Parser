@@ -21,6 +21,7 @@ public:
     std::string out();
     // resets bools to prevent any weird memory trickery from adding a 0 value in
     void reset();
+    bool check_values(char* arr, int arr_len);
 };
 
 

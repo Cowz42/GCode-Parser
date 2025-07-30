@@ -20,3 +20,23 @@ void GCodeInstruction::reset() {
     _j = false;
     _s = false;
 };
+
+bool GCodeInstruction::check_values(char* arr, int arr_len) {
+    for (int i = 0; i < arr_len; i++) {
+        if (arr[i] == 'X' && !_x) {
+            return false;
+        } else if (arr[i] == 'Y' && !_y) {
+            return false;
+        } else if (arr[i] == 'Z' && !_z) {
+            return false;
+        } else if (arr[i] == 'F' && !_f) {
+            return false;
+        } else if (arr[i] == 'I' && !_i) {
+            return false;
+        } else if (arr[i] == 'J' && !_j) {
+            return false;
+        } else if (arr[i] == 'S' && !_s) {
+            return false;
+        }
+    }
+};

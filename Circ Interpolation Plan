@@ -1,0 +1,12 @@
+Algorithm for calculating the circular interpolation
+
+
+finds angle to center for the current point
+finds angle to the end point
+steps through all the points in between calculating their values
+
+step size should be fairly small
+
+
+angle start = atan(start_y / start_x)
+angle end = atan(end_y / end_y)
