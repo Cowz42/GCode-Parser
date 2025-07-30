@@ -1,10 +1,8 @@
 #include <iostream>
-#include <fstream>
 #include <string>
 #include "gcodeparse.h"
-#include "gcode.h"
 #include "commandlineread.h"
-#include "generatestep.h"
+#include <fstream>
 using namespace std;
 
 

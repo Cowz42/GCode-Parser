@@ -5,14 +5,11 @@
 #ifndef machine_h
 #define machine_h
 
+#include "plane.h"
+
 class Machine {
 private:
     float x, y, z, f, s;
-    enum Plane {
-        XY,
-        YZ,
-        XZ,
-    };
     Plane plane;
     bool absolute;
 
@@ -25,6 +22,9 @@ public:
     float get_f();
     float get_s();
     Plane get_plane();
+
+    void set_f(float new_f);
+    void set_s(float new_s);
 };
 
 
