@@ -16,6 +16,7 @@ GCode parsing class
 #define gcodeparse_h
 
 #include "gcode.h"
+#include <fstream>
 
 // Class that reads a gcode file and outputs the commands using a different class
 class GCodeParse {
