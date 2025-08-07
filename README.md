@@ -1,5 +1,11 @@
 GCode Parser
 
+IMPORTANT
+You need to write your own Machine::run_low() function
+this function is for interface with the baremetal components, and will not be the same between hardware implementations, I will write my own but it will only work for my own project, and it will be in a different file
+you can see the source code to figure out how to connect it to your own implementation
+
+
 for parsing gcode into easy for machines to read packets of numbers
 
 compiled with 

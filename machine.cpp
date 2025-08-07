@@ -3,6 +3,7 @@
 #include "plane.h"
 #include "generatestep.h"
 #include <cmath>
+#include "bounds.h"
 
 float abs(float n) {
     if (n >= 0) {
@@ -12,10 +13,11 @@ float abs(float n) {
 }
 
 
-Machine::Machine() {
+Machine::Machine(Bounds bounds_in) {
     // only real modes to run it in
     plane = XY;
     absolute = true;
+    bounds = bounds_in;
 };
 
 // boiler plate
@@ -56,6 +58,9 @@ int Machine::run(GCodeInstruction* command) {
     // loops through until stepgen is finished with its task
     while(steps > 0) {
         steps = stepgen.next(&new_x, &new_y, &new_z);
+        if (!check_bounds()) {
+            return -2;
+        }
         calc_speeds();
         run_low();
     }
@@ -77,3 +82,7 @@ double Machine::dist(float x1, float y1, float z1, float x2, float y2, float z2)
     return std::sqrt((x1 - x2)*(x1 - x2) + (y1 - y2)*(y1 - y2) + (z1 - z2)*(z1 - z2));
 };
 
+// checks to make sure the machine can actually go there
+bool Machine::check_bounds() {
+    return (new_x <= bounds.x_max && new_x >= bounds.x_min && new_y <= bounds.y_max && new_y >= bounds.y_min && new_z <= bounds.z_max && new_z >=bounds.z_min &&  f <= bounds.f_max && s <= bounds.s_max);      
+};
