@@ -185,7 +185,7 @@ float GCodeParse::read_float(string str) {
 
 };
 
-int64_t GCodeParse::read_int(string_view str) {
+int64_t GCodeParse::read_int(string str) {
     int64_t sum = 0;
     // goes through array in reverse for more convienent power multiplcation
     for (int i = str.length() - 1; i > -1; i--) {
@@ -202,7 +202,7 @@ int64_t GCodeParse::read_int(string_view str) {
 };
 
 
-int GCodeParse::crawl_too(string_view str, char crawl_char, int start_from) {
+int GCodeParse::crawl_too(string str, char crawl_char, int start_from) {
     // checks for out of range
     if (start_from >= str.length()) {return -1;}
     // searches looking for the value
