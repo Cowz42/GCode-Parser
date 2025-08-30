@@ -16,6 +16,7 @@ GCode parsing class
 #define gcodeparse_h
 
 #include "gcode.h"
+#include <fstream>
 
 // Class that reads a gcode file and outputs the commands using a different class
 class GCodeParse {
@@ -38,10 +39,10 @@ private:
     float read_float(std::string str);
 
     // takes a string and converts it into an int
-    int64_t read_int(std::string_view str);
+    int64_t read_int(std::string str);
 
     // takes a string and sequentially tests for the test case, and returns the index of it
-    int crawl_too(std::string_view str, char crawl_char, int start_from = 0);
+    int crawl_too(std::string str, char crawl_char, int start_from = 0);
 
     // finds a number after a specific character, e.g. return 1.5 from ("I like potatoes H1.5", 'H')
     float crawl_too_number(std::string str, char crawl_too);

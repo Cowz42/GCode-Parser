@@ -1,8 +1,6 @@
 #include <iostream>
-#include <fstream>
 #include <string>
 #include "gcodeparse.h"
-#include "gcode.h"
 #include "commandlineread.h"
 using namespace std;
 

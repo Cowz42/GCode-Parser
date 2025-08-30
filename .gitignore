@@ -1,0 +1,10 @@
+a.out
+a-main.o
+commandlineread.o
+gcode.o
+gcodeparse.o
+generatestep.o
+machine.o
+main.o
+run_low.o
+parse_test.o
