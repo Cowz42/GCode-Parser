@@ -20,7 +20,7 @@ class Machine {
 private:
     // function unique to the baremetal and it's control interfaces, has to be written by the bare metal designer/programmer
     // I can't really define a function that's always going to be different
-    void run_low(float in_x, float in_y, float in_z, float s_x, float s_y, float s_z);
+    void run_low(float in_x, float in_y, float in_z, float s_x, float s_y, float s_z, float f, float s);
 
     // NEEDS run_low() to change the x, y, z
 

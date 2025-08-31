@@ -62,7 +62,7 @@ int Machine::run(GCodeInstruction* command) {
             return -2;
         }
         calc_speeds();
-        run_low();
+        run_low(new_x, new_y, new_z, speed_x, speed_y, speed_z, f, s);
     }
     return 0;
 };
